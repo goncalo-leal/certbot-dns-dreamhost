@@ -1,17 +1,11 @@
-import json
-import time
 import logging
 import requests
-import zope.interface
 
 from certbot import errors
-from certbot import interfaces
 from certbot.plugins import dns_common
 
 logger = logging.getLogger(__name__)
 
-@zope.interface.implementer(interfaces.IAuthenticator)
-@zope.interface.provider(interfaces.IPluginFactory)
 class Authenticator(dns_common.DNSAuthenticator):
     """
     DNS Authenticator for DreamHost
@@ -199,7 +193,3 @@ class _DreamHostClient(object):
                 return record
 
         return None
-
-# https://github.com/m42e/certbot-dns-ispconfig/blob/master/certbot_dns_ispconfig/dns_ispconfig.py
-# https://help.dreamhost.com/hc/en-us/articles/217555707-DNS-API-commands
-# https://api.dreamhost.com/?key=6SHU5P2HLDAYECU&cmd=dns-list_records&format=json

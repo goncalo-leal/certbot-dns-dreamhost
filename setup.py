@@ -1,15 +1,13 @@
 from setuptools import setup
 from setuptools import find_packages
 
-VERSION = "0.2.2"
+VERSION = "0.3.0"
 
 install_requires = [
     "acme>=0.29.0",
     "certbot>=0.34.0",
     "setuptools",
     "requests",
-    "mock",
-    "requests-mock",
 ]
 
 setup(
@@ -26,6 +24,6 @@ setup(
     entry_points={
         "certbot.plugins": [
             "dns-dreamhost = certbot_dns_dreamhost.dns_dreamhost:Authenticator"
-        ]
+        ],
     },
 )
