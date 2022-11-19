@@ -52,7 +52,7 @@ class Authenticator(dns_common.DNSAuthenticator):
             validation_name, validation
         )
 
-    def _perform(self, domain, validation_name, validation):
+    def _cleanup(self, domain, validation_name, validation):
         self._get_dreamhost_client().delete_txt_record(
             validation_name, validation
         )
