@@ -1,4 +1,11 @@
+"""
+Authors: Gonçalo Leal
+Email: gleal@ubiwhere.com
+Last Update: 23-11-2022
+"""
+
 import logging
+from typing import Callable
 import requests
 
 from certbot import errors
@@ -21,23 +28,21 @@ class Authenticator(dns_common.DNSAuthenticator):
         self.credentials = None
 
     @classmethod
-    def add_parser_arguments(cls, add):
-        """
-        Read config file
-        """
-
+    def add_parser_arguments(
+        cls, add: Callable[..., None], default_propagation_seconds: int = 120
+    ) -> None:
         super().add_parser_arguments(
-            add, default_propagation_seconds=120
+            add, default_propagation_seconds
         )
         add("credentials", help="DreamHost credentials .ini file.")
 
-    def more_info(self):  # pylint: disable=missing-docstring
+    def more_info(self) -> str:  # pylint: disable=missing-docstring
         return (
             "This plugin configures a DNS .txt record to respond to a dns-01 challenge using "
             + "the DreamHost Remote REST API."
         )
 
-    def _setup_credentials(self):
+    def _setup_credentials(self) -> None:
         self.credentials = self._configure_credentials(
             "credentials",
             "DreamHost credentials INI file",
@@ -47,23 +52,23 @@ class Authenticator(dns_common.DNSAuthenticator):
             },
         )
 
-    def _perform(self, domain, validation_name, validation):
+    def _perform(self, domain, validation_name, validation) -> None:
         self._get_dreamhost_client().add_txt_record(
             validation_name, validation
         )
 
-    def _cleanup(self, domain, validation_name, validation):
+    def _cleanup(self, domain, validation_name, validation) -> None:
         self._get_dreamhost_client().delete_txt_record(
             validation_name, validation
         )
 
-    def _get_dreamhost_client(self):
+    def _get_dreamhost_client(self) -> "_DreamHostClient":
         return _DreamHostClient(
             self.credentials.conf("baseurl"),
             self.credentials.conf("api_key"),
         )
 
-class _DreamHostClient(object):
+class _DreamHostClient():
     """
     Encapsulates all communication with the DreamHost REST API
     """
@@ -94,7 +99,7 @@ class _DreamHostClient(object):
         logger.debug("the key is valid")
         return True
 
-    def _api_request(self, action):
+    def _api_request(self, action: str):
         if not self.valid_key:
             return None
 
@@ -102,7 +107,7 @@ class _DreamHostClient(object):
         resp = self.session.get(url)
         logger.debug("API Request | cmd = %s", url)
         if resp.status_code != 200:
-            raise errors.Plurequests.exceptionsginError(
+            raise Exception(
                 f"HTTP Error during login {resp.status_code}"
             )
         try:
@@ -119,14 +124,13 @@ class _DreamHostClient(object):
             f"API response with an error: {result['data']}"
         )
 
-    def _get_url(self, action):
+    def _get_url(self, action:str):
         return f"{self.baseurl}?key={self.api_key}&cmd={action}"
 
-    def add_txt_record(self, record_name, record_content):
+    def add_txt_record(self, record_name:str, record_content:str) -> None:
         """
         Add a .txt record to a specific domain
 
-        :param str domain: The domain where the record should be added
         :param str record_name: The record name
         :param str record_content: The record content
         :raises exception if an error occurs communicating with the DreamHost API
@@ -150,11 +154,10 @@ class _DreamHostClient(object):
         logger.info("Creating a new TXT record")
         self._api_request(f"dns-add_record&record={record_name}&type=TXT&value={record_content}")
 
-    def delete_txt_record(self, record_name, record_content):
+    def delete_txt_record(self, record_name:str, record_content:str):
         """
         Delete a .txt record from a specific domain
 
-        :param str domain: The domain where the record should be added
         :param str record_name: The record name
         :param str record_content: The record content
         :raises exception if an error occurs communicating with the DreamHost API
@@ -171,9 +174,9 @@ class _DreamHostClient(object):
                     f"dns-remove_record&record={record_name}&type=TXT&value={record_content}"
                 )
 
-    def get_existing_txt(self, record_name):
+    def get_existing_txt(self, record_name:str) -> str:
         """
-        Searches for an already existing TXT record that contains 
+        Searches for an already existing TXT record that contains
         the same content that we want to store.
 
         :param str record_name: the record name
