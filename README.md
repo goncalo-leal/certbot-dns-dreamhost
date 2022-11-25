@@ -25,13 +25,13 @@ dns_dreamhost_api_key = "<api_key>"
 
 3. You can secure your file and assure that only your user is able to read and write on it: 
 ```bash
-chmod 0600 /etc/letsencrypt/dns-multi.ini
+chmod 0600 /etc/letsencrypt/dns-dreamhost.ini
 ```
 
 4. Try to issue a certificate:
 ```bash
 certbot certonly --authenticator dns-dreamhost \
---dns-dreamhost-credentials /etc/letsencrypt/dns-multi.ini \
+--dns-dreamhost-credentials /etc/letsencrypt/dns-dreamhost.ini \
 -d '*.example.com'
 ```
 
